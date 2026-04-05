@@ -1,0 +1,160 @@
+.node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  min-width: 180px;
+  cursor: default;
+}
+
+.node:hover {
+  border-color: var(--text-secondary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.node.audited {
+  border-left: 3px solid var(--success-color);
+}
+
+.node.certified {
+  border-left: 3px solid var(--certified-color);
+}
+
+.idWrapper {
+  flex-grow: 1;
+}
+
+.locationId {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.checksContainer {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.checkWrapper {
+  position: relative;
+}
+
+/* Custom Checkbox */
+.customCheckbox {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  user-select: none;
+}
+
+.customCheckbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.customCheckbox:hover input ~ .checkmark {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Audited check uses success color */
+.customCheckbox input:checked ~ .auditMark {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+}
+
+/* Certified check uses certified color */
+.customCheckbox input:checked ~ .certMark {
+  background-color: var(--certified-color);
+  border-color: var(--certified-color);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.customCheckbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.customCheckbox .checkmark:after {
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Tooltip info on hover */
+.infoTooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.node:hover .infoTooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(5px);
+}
+
+.tooltipLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.tooltipLine:last-child {
+  margin-bottom: 0;
+}
+
+.tagAudit { color: var(--success-color); font-weight: bold; }
+.tagCert { color: var(--certified-color); font-weight: bold; }
+
+.date {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+}
