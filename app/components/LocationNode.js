@@ -1,27 +1,58 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './LocationNode.module.css';
-import { saveAudit, saveCert } from '../../lib/db';
+import { saveAudit, saveCert, resetLocation } from '../../lib/db';
 
 export default function LocationNode({ locationId, locationData, onRequestSignature }) {
+  const [confirming, setConfirming] = useState(false);
+
   // Los datos vienen de Firestore en tiempo real a través de props
   const auditData = locationData?.audit || null;
   const certData = locationData?.cert || null;
+  const hasData = auditData || certData;
 
   const handleAuditClick = () => {
-    if (auditData) return; // Ya está auditado
+    if (auditData) return;
     onRequestSignature('Auditado', locationId, async (name, errorRate, dateStr) => {
       await saveAudit(locationId, { name, date: dateStr });
     });
   };
 
   const handleCertClick = () => {
-    if (certData) return; // Ya está certificado
+    if (certData) return;
     onRequestSignature('Certificado', locationId, async (name, errorRate, dateStr) => {
       await saveCert(locationId, { name, errorRate, date: dateStr });
     });
   };
+
+  const handleResetClick = (e) => {
+    e.stopPropagation();
+    setConfirming(true);
+  };
+
+  const confirmReset = async (e) => {
+    e.stopPropagation();
+    await resetLocation(locationId);
+    setConfirming(false);
+  };
+
+  const cancelReset = (e) => {
+    e.stopPropagation();
+    setConfirming(false);
+  };
+
+  if (confirming) {
+    return (
+      <div className={`${styles.node} ${styles.confirmingReset}`}>
+        <div className={styles.confirmText}>¿Borrar datos de esta ubicación?</div>
+        <div className={styles.confirmActions}>
+          <button className={styles.btnCancel} onClick={cancelReset}>No</button>
+          <button className={styles.btnReset} onClick={confirmReset}>Sí, borrar</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`${styles.node} ${auditData ? styles.audited : ''} ${certData ? styles.certified : ''}`}>
@@ -43,6 +74,16 @@ export default function LocationNode({ locationId, locationData, onRequestSignat
             <span className={`${styles.checkmark} ${styles.certMark}`}></span>
           </label>
         </div>
+
+        {hasData && (
+          <button
+            className={styles.resetBtn}
+            onClick={handleResetClick}
+            title="Resetear esta ubicación"
+          >
+            ↺
+          </button>
+        )}
       </div>
       
       {(auditData || certData) && (

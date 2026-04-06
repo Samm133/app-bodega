@@ -55,3 +55,31 @@
 
 /* If you want the text to glow green when 100% you could do that logic via a class 
    but for now, the progress slider handles the visual feedback perfectly. */
+
+/* ===================== MOBILE ===================== */
+@media (max-width: 768px) {
+  .sectionNode {
+    min-width: 0;
+    min-height: 0;
+    border-radius: 6px;
+  }
+
+  .title {
+    font-size: 0.6rem;
+  }
+
+  .percentage {
+    font-size: 0.55rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 0.45rem;
+  }
+
+  .percentage {
+    display: none;
+  }
+}
+

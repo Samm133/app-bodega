@@ -137,3 +137,65 @@
     justify-content: flex-start;
   }
 }
+
+@media (max-width: 768px) {
+  .main {
+    padding: 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: 1.2rem;
+  }
+
+  .titleInfo {
+    font-size: 0.8rem;
+  }
+
+  .mapContainer {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .mapGrid {
+    grid-template-columns: repeat(13, 68px);
+    grid-auto-rows: 52px;
+    gap: 7px;
+  }
+
+  .globalDashboard {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 12px;
+  }
+
+  .statBox {
+    width: 100%;
+  }
+
+  .statValue {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mapGrid {
+    grid-template-columns: repeat(13, 48px);
+    grid-auto-rows: 38px;
+    gap: 5px;
+  }
+
+  .mapContainer {
+    padding: 10px;
+  }
+}
+
