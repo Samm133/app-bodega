@@ -26,6 +26,23 @@
   border-left: 3px solid var(--certified-color);
 }
 
+/* Auditado pero pendiente de certificar */
+.node.pendingCert {
+  border-left: 3px solid #f59e0b;
+}
+
+.pendingBadge {
+  font-size: 0.9rem;
+  animation: pulseBadge 1.5s ease-in-out infinite;
+  cursor: default;
+  line-height: 1;
+}
+
+@keyframes pulseBadge {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
 /* Reset confirmation state */
 .node.confirmingReset {
   border-left: 3px solid #ef4444;

@@ -11,6 +11,7 @@ export default function LocationNode({ locationId, locationData, onRequestSignat
   const auditData = locationData?.audit || null;
   const certData = locationData?.cert || null;
   const hasData = auditData || certData;
+  const pendingCert = auditData && !certData; // Auditado pero sin certificar
 
   const handleAuditClick = () => {
     if (auditData) return;
@@ -55,12 +56,17 @@ export default function LocationNode({ locationId, locationData, onRequestSignat
   }
 
   return (
-    <div className={`${styles.node} ${auditData ? styles.audited : ''} ${certData ? styles.certified : ''}`}>
+    <div className={`${styles.node} ${auditData ? styles.audited : ''} ${certData ? styles.certified : ''} ${pendingCert ? styles.pendingCert : ''}`}>
       <div className={styles.idWrapper}>
         <span className={styles.locationId}>{locationId}</span>
       </div>
       
       <div className={styles.checksContainer}>
+        {pendingCert && (
+          <div className={styles.pendingBadge} title="Auditado — pendiente de certificar">
+            ⚠
+          </div>
+        )}
         <div className={styles.checkWrapper} title={auditData ? `Auditado por: ${auditData.name}\n${auditData.date}` : 'Marcar como Auditado'}>
           <label className={styles.customCheckbox} onClick={(e) => { e.preventDefault(); handleAuditClick(); }}>
             <input type="checkbox" checked={!!auditData} readOnly />
