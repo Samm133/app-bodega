@@ -165,9 +165,9 @@
   }
 
   .mapGrid {
-    grid-template-columns: repeat(13, 68px);
-    grid-auto-rows: 52px;
-    gap: 7px;
+    grid-template-columns: repeat(13, 90px);
+    grid-auto-rows: 68px;
+    gap: 8px;
   }
 
   .globalDashboard {
@@ -189,9 +189,9 @@
 
 @media (max-width: 480px) {
   .mapGrid {
-    grid-template-columns: repeat(13, 48px);
-    grid-auto-rows: 38px;
-    gap: 5px;
+    grid-template-columns: repeat(13, 76px);
+    grid-auto-rows: 58px;
+    gap: 7px;
   }
 
   .mapContainer {
