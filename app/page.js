@@ -5,6 +5,7 @@ import SectionBlock from './components/SectionBlock';
 import SectionDetailsModal from './components/SectionDetailsModal';
 import SignatureModal from './components/SignatureModal';
 import styles from './page.module.css';
+import { subscribeToLocations } from '../lib/db';
 
 // Estructura matricial de la bodega
 const gridData = [
@@ -77,9 +78,18 @@ export default function Home() {
   });
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
-  const [refreshVersion, setRefreshVersion] = useState(0);
+  const [locationsMap, setLocationsMap] = useState({});
   const [globalStats, setGlobalStats] = useState({ progress: 0, errorRate: 0 });
 
+  // Suscripción única y global a Firestore en tiempo real
+  useEffect(() => {
+    const unsubscribe = subscribeToLocations((map) => {
+      setLocationsMap(map);
+    });
+    return unsubscribe; // Limpieza al desmontar
+  }, []);
+
+  // Calcula las estadísticas globales cada vez que cambia el mapa de ubicaciones
   useEffect(() => {
     let totalPossible = 0;
     let completedPoints = 0;
@@ -87,26 +97,21 @@ export default function Home() {
     let certifiedCount = 0;
 
     gridData.forEach(item => {
-      // Solo contamos las secciones que generan 8 casillas interiormente (ignoramos pillars y transits)
       if (item.type !== 'pillar' && item.type !== 'transit') {
         totalPossible += 16; // 8 casillas x 2 checks por casilla
         
         for (let i = 1; i <= 8; i++) {
           const suffix = String(i).padStart(3, '0');
           const locId = `${item.id}/${suffix}`;
-          const saved = localStorage.getItem(`loc_${locId}`);
+          const docId = locId.replaceAll('/', '_');
+          const data = locationsMap[docId];
           
-          if (saved) {
-            try {
-              const parsed = JSON.parse(saved);
-              if (parsed.audit) completedPoints += 1;
-              if (parsed.cert) {
-                completedPoints += 1;
-                certifiedCount += 1;
-                totalError += (parsed.cert.errorRate || 0);
-              }
-            } catch (e) {
-              // Ignore
+          if (data) {
+            if (data.audit) completedPoints += 1;
+            if (data.cert) {
+              completedPoints += 1;
+              certifiedCount += 1;
+              totalError += (data.cert.errorRate || 0);
             }
           }
         }
@@ -115,10 +120,8 @@ export default function Home() {
 
     const progressPercent = totalPossible === 0 ? 0 : Math.round((completedPoints / totalPossible) * 100);
     const errorPercent = certifiedCount === 0 ? 0 : (totalError / certifiedCount).toFixed(2);
-
     setGlobalStats({ progress: progressPercent, errorRate: parseFloat(errorPercent) });
-
-  }, [refreshVersion]);
+  }, [locationsMap]);
 
   const handleRequestSignature = (actionName, locationId, callback) => {
     setModalConfig({ isOpen: true, actionName, locationId, callback });
@@ -133,7 +136,18 @@ export default function Home() {
     setActiveSection(sectionPrefix);
     setDetailsModalOpen(true);
   };
-  const triggerProgressRefresh = () => setRefreshVersion(prev => prev + 1);
+
+  // Construye el objeto de datos para una sección a partir del mapa global
+  const getSectionData = (sectionPrefix) => {
+    const data = {};
+    for (let i = 1; i <= 8; i++) {
+      const suffix = String(i).padStart(3, '0');
+      const locId = `${sectionPrefix}/${suffix}`;
+      const docId = locId.replaceAll('/', '_');
+      data[locId] = locationsMap[docId] || {};
+    }
+    return data;
+  };
 
   const isErrorCritical = globalStats.errorRate > 1.0;
 
@@ -164,10 +178,13 @@ export default function Home() {
                 </div>
               );
             }
-            // Mapeo estándar de sección
             return (
               <div key={item.id} style={gridStyle}>
-                 <SectionBlock sectionPrefix={item.id} onClick={openSectionDetails} refreshVersion={refreshVersion} />
+                <SectionBlock
+                  sectionPrefix={item.id}
+                  onClick={openSectionDetails}
+                  sectionData={getSectionData(item.id)}
+                />
               </div>
             );
           })}
@@ -201,12 +218,18 @@ export default function Home() {
       </div>
 
       <SectionDetailsModal 
-        isOpen={detailsModalOpen} sectionPrefix={activeSection} onClose={() => setDetailsModalOpen(false)}
-        onRequestSignature={handleRequestSignature} onLocationUpdate={triggerProgressRefresh}
+        isOpen={detailsModalOpen}
+        sectionPrefix={activeSection}
+        onClose={() => setDetailsModalOpen(false)}
+        onRequestSignature={handleRequestSignature}
+        locationsMap={locationsMap}
       />
       <SignatureModal 
-        isOpen={modalConfig.isOpen} actionName={modalConfig.actionName} locationId={modalConfig.locationId}
-        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })} onConfirm={handleConfirmSignature}
+        isOpen={modalConfig.isOpen}
+        actionName={modalConfig.actionName}
+        locationId={modalConfig.locationId}
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+        onConfirm={handleConfirmSignature}
       />
     </main>
   );

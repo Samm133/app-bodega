@@ -1,44 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styles from './LocationNode.module.css';
+import { saveAudit, saveCert } from '../../lib/db';
 
-export default function LocationNode({ locationId, onRequestSignature, onUpdate }) {
-  const [auditData, setAuditData] = useState(null);
-  const [certData, setCertData] = useState(null);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(`loc_${locationId}`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.audit) setAuditData(parsed.audit);
-        if (parsed.cert) setCertData(parsed.cert);
-      } catch (e) {
-        console.error("Error parsing localstorage data");
-      }
-    }
-  }, [locationId]);
-
-  useEffect(() => {
-    if (auditData || certData) {
-      localStorage.setItem(`loc_${locationId}`, JSON.stringify({
-        audit: auditData,
-        cert: certData
-      }));
-      if (onUpdate) onUpdate();
-    }
-  }, [auditData, certData, locationId]);
+export default function LocationNode({ locationId, locationData, onRequestSignature }) {
+  // Los datos vienen de Firestore en tiempo real a través de props
+  const auditData = locationData?.audit || null;
+  const certData = locationData?.cert || null;
 
   const handleAuditClick = () => {
-    onRequestSignature('Auditado', locationId, (name, errorRate, dateStr) => {
-      setAuditData({ name, date: dateStr });
+    if (auditData) return; // Ya está auditado
+    onRequestSignature('Auditado', locationId, async (name, errorRate, dateStr) => {
+      await saveAudit(locationId, { name, date: dateStr });
     });
   };
 
   const handleCertClick = () => {
-    onRequestSignature('Certificado', locationId, (name, errorRate, dateStr) => {
-      setCertData({ name, errorRate, date: dateStr });
+    if (certData) return; // Ya está certificado
+    onRequestSignature('Certificado', locationId, async (name, errorRate, dateStr) => {
+      await saveCert(locationId, { name, errorRate, date: dateStr });
     });
   };
 

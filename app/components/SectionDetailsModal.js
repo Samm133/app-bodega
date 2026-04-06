@@ -4,7 +4,7 @@ import React from 'react';
 import LocationNode from './LocationNode';
 import styles from './SectionDetailsModal.module.css';
 
-export default function SectionDetailsModal({ isOpen, sectionPrefix, onClose, onRequestSignature, onLocationUpdate }) {
+export default function SectionDetailsModal({ isOpen, sectionPrefix, onClose, onRequestSignature, locationsMap }) {
   if (!isOpen) return null;
 
   // Genera desde el 001 hasta el 008 para esta sección
@@ -26,20 +26,24 @@ export default function SectionDetailsModal({ isOpen, sectionPrefix, onClose, on
         </p>
 
         <div className={styles.gridContainer}>
-          {locations.map(locId => (
-             <LocationNode 
-               key={locId} 
-               locationId={locId} 
-               onRequestSignature={onRequestSignature} 
-               onUpdate={() => onLocationUpdate()} 
-             />
-          ))}
+          {locations.map(locId => {
+            const docId = locId.replaceAll('/', '_');
+            const locationData = locationsMap ? (locationsMap[docId] || {}) : {};
+            return (
+              <LocationNode 
+                key={locId} 
+                locationId={locId} 
+                locationData={locationData}
+                onRequestSignature={onRequestSignature} 
+              />
+            );
+          })}
         </div>
         
         <div className={styles.modalActions}>
-           <button type="button" className={styles.btnDone} onClick={onClose}>
-             Listo
-           </button>
+          <button type="button" className={styles.btnDone} onClick={onClose}>
+            Listo
+          </button>
         </div>
       </div>
     </div>
