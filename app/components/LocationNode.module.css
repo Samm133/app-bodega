@@ -261,6 +261,7 @@
   .node {
     padding: 12px 14px;
     border-radius: 10px;
+    flex-wrap: wrap;
   }
 
   .locationId {
@@ -295,8 +296,22 @@
     font-size: 1.2rem;
   }
 
-  /* On mobile, show tooltip always if data exists (no hover) */
+  /* En móvil mostramos el tooltip siempre como texto inline */
   .infoTooltip {
-    display: none;
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    white-space: normal;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    padding: 4px 0 0 0;
+    width: 100%;
+    pointer-events: auto;
+  }
+
+  .tooltipLine {
+    font-size: 0.75rem;
   }
 }
