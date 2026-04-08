@@ -7,8 +7,10 @@ import styles from './SectionDetailsModal.module.css';
 export default function SectionDetailsModal({ isOpen, sectionPrefix, onClose, onRequestSignature, locationsMap }) {
   if (!isOpen) return null;
 
-  // Genera desde el 001 hasta el 008 para esta sección
-  const locations = Array.from({ length: 8 }, (_, i) => {
+  // Genera ubicaciones: 001/009 tiene 4, las demás tienen 8
+  const isLimitedSection = sectionPrefix === '001/009';
+  const locationCount = isLimitedSection ? 4 : 8;
+  const locations = Array.from({ length: locationCount }, (_, i) => {
     const suffix = String(i + 1).padStart(3, '0');
     return `${sectionPrefix}/${suffix}`;
   });
