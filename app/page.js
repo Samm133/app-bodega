@@ -25,14 +25,14 @@ const gridData = [
 
   // Pilar debajo de 001/003
   { type: 'pillar', col: 4, row: 2 },
-  
+
   // Aislados (Fila 3)
   { id: '600/001', col: 1, row: 3 },
   { type: 'pillar', col: 5, row: 3 },
   { type: 'transit', id: 'Zona de Tránsito', col: 6, row: 3, colSpan: 3, rowSpan: 2 },
   { type: 'pillar', col: 9, row: 3 },
   { id: '003/006', col: 10, row: 3 },
-  
+
   // Pilar Cerca del pasillo 2 derecho
   { type: 'pillar', col: 12, row: 3 },
 
@@ -99,13 +99,13 @@ export default function Home() {
     gridData.forEach(item => {
       if (item.type !== 'pillar' && item.type !== 'transit') {
         totalPossible += 16; // 8 casillas x 2 checks por casilla
-        
+
         for (let i = 1; i <= 8; i++) {
           const suffix = String(i).padStart(3, '0');
           const locId = `${item.id}/${suffix}`;
           const docId = locId.replaceAll('/', '_');
           const data = locationsMap[docId];
-          
+
           if (data) {
             if (data.audit) completedPoints += 1;
             if (data.cert) {
@@ -154,7 +154,7 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <header className={styles.header}>
-        <h1>Planograma Arquitectónico Exacto</h1>
+        <h1>Bodega ACP</h1>
         <div className={styles.titleInfo}>
           La disposición física de los pasillos ha sido mapeada fielmente.
         </div>
@@ -201,15 +201,15 @@ export default function Home() {
             <div className={styles.statBarFill} style={{ width: `${globalStats.progress}%`, background: 'var(--success-color)' }}></div>
           </div>
         </div>
-        
+
         <div className={styles.statBox}>
           <div className={styles.statLabel}>Error Promedio (Límite 1%)</div>
           <div className={`${styles.statValue} ${isErrorCritical ? styles.errorCritical : styles.errorSafe}`}>
             {globalStats.errorRate}%
           </div>
           <div className={styles.statBarBg}>
-            <div className={styles.statBarFill} style={{ 
-              width: `${Math.min(globalStats.errorRate * 10, 100)}%`, 
+            <div className={styles.statBarFill} style={{
+              width: `${Math.min(globalStats.errorRate * 10, 100)}%`,
               background: isErrorCritical ? '#ef4444' : 'var(--success-color)',
               transition: 'all 0.3s'
             }}></div>
@@ -217,14 +217,14 @@ export default function Home() {
         </div>
       </div>
 
-      <SectionDetailsModal 
+      <SectionDetailsModal
         isOpen={detailsModalOpen}
         sectionPrefix={activeSection}
         onClose={() => setDetailsModalOpen(false)}
         onRequestSignature={handleRequestSignature}
         locationsMap={locationsMap}
       />
-      <SignatureModal 
+      <SignatureModal
         isOpen={modalConfig.isOpen}
         actionName={modalConfig.actionName}
         locationId={modalConfig.locationId}
