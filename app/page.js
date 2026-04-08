@@ -89,6 +89,13 @@ export default function Home() {
     return unsubscribe; // Limpieza al desmontar
   }, []);
 
+  // Cantidad de ubicaciones por sección
+  const getLocationCount = (sectionId) => {
+    if (sectionId === '001/009') return 4;
+    if (['003/001', '003/002', '003/003', '003/004', '003/005'].includes(sectionId)) return 10;
+    return 8;
+  };
+
   // Calcula las estadísticas globales cada vez que cambia el mapa de ubicaciones
   useEffect(() => {
     let totalPossible = 0;
@@ -98,9 +105,10 @@ export default function Home() {
 
     gridData.forEach(item => {
       if (item.type !== 'pillar' && item.type !== 'transit') {
-        totalPossible += 16; // 8 casillas x 2 checks por casilla
+        const locCount = getLocationCount(item.id);
+        totalPossible += locCount * 2;
 
-        for (let i = 1; i <= 8; i++) {
+        for (let i = 1; i <= locCount; i++) {
           const suffix = String(i).padStart(3, '0');
           const locId = `${item.id}/${suffix}`;
           const docId = locId.replaceAll('/', '_');
@@ -140,7 +148,8 @@ export default function Home() {
   // Construye el objeto de datos para una sección a partir del mapa global
   const getSectionData = (sectionPrefix) => {
     const data = {};
-    for (let i = 1; i <= 8; i++) {
+    const locCount = getLocationCount(sectionPrefix);
+    for (let i = 1; i <= locCount; i++) {
       const suffix = String(i).padStart(3, '0');
       const locId = `${sectionPrefix}/${suffix}`;
       const docId = locId.replaceAll('/', '_');
@@ -220,6 +229,7 @@ export default function Home() {
       <SectionDetailsModal
         isOpen={detailsModalOpen}
         sectionPrefix={activeSection}
+        locationCount={getLocationCount(activeSection)}
         onClose={() => setDetailsModalOpen(false)}
         onRequestSignature={handleRequestSignature}
         locationsMap={locationsMap}
